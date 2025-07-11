@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const beadButton = document.getElementById('bead-button');
     const resetButton = document.getElementById('reset-button');
     const instructionText = document.querySelector('.instruction-text');
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmResetBtn = document.getElementById('confirm-reset');
+    const cancelResetBtn = document.getElementById('cancel-reset');
 
 
     // -------------------
@@ -75,11 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (state.completedRounds >= schedule.targetRounds) {
             instructionText.textContent = `ယနေ့အတွက် ပြီးမြောက်ပါပြီ။ နောက်နေ့ဆက်ရန် အစမှပြန်စရန်ကိုနှိပ်ပါ။`;
-            beadButton.classList.add('completed');
             beadButton.disabled = true;
         } else {
             instructionText.textContent = 'ပုတီးတစ်လုံးချရန် နှိပ်ပါ';
-            beadButton.classList.remove('completed');
             beadButton.disabled = false;
         }
     }
@@ -122,20 +123,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------
     beadButton.addEventListener('click', handleBeadClick);
 
+    let nextDayMode = false;
+
     resetButton.addEventListener('click', () => {
         const schedule = getScheduleForDay(state.currentDayIndex);
-
-        // If current day is completed, confirm to move to next day
         if (state.completedRounds >= schedule.targetRounds) {
-            if (confirm("ယနေ့အတွက် ပြီးမြောက်ပါပြီ။ နောက်တစ်နေ့သို့ ကူးပြောင်းလိုပါသလား?")) {
-                resetProgress(true); // true means move to next day
-            }
+            nextDayMode = true;
         } else {
-            // If not completed, confirm to reset all progress
-            if (confirm("လက်ရှိ ပြုလုပ်ထားသမျှကို ဖျက်ပြီး ပထမဆုံးနေ့မှ အစပြန်ပြုလုပ်လိုပါသလား?")) {
-                resetProgress(false); // false means reset to day 1
-            }
+            nextDayMode = false;
         }
+        confirmModal.classList.remove('hidden');
+    });
+
+    confirmResetBtn.addEventListener('click', () => {
+        confirmModal.classList.add('hidden');
+        resetProgress(nextDayMode);
+    });
+
+    cancelResetBtn.addEventListener('click', () => {
+        confirmModal.classList.add('hidden');
     });
 
     // -------------------
