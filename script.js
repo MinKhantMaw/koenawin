@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmModal = document.getElementById('confirm-modal');
     const confirmResetBtn = document.getElementById('confirm-reset');
     const cancelResetBtn = document.getElementById('cancel-reset');
+    const todayFinishModal = document.getElementById('today-finish-modal');
+    const closeTodayFinishBtn = document.getElementById('close-today-finish');
 
 
     // -------------------
@@ -78,9 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (state.completedRounds >= schedule.targetRounds) {
             instructionText.textContent = `ယနေ့အတွက် ပြီးမြောက်ပါပြီ။ နောက်နေ့ဆက်ရန် အစမှပြန်စရန်ကိုနှိပ်ပါ။`;
+            instructionText.classList.add('bg-green-100', 'text-green-700', 'rounded-lg', 'p-3', 'font-bold', 'border', 'border-green-300');
             beadButton.disabled = true;
         } else {
             instructionText.textContent = 'ပုတီးတစ်လုံးချရန် နှိပ်ပါ';
+            instructionText.classList.remove('bg-green-100', 'text-green-700', 'rounded-lg', 'p-3', 'font-bold', 'border', 'border-green-300');
             beadButton.disabled = false;
         }
     }
@@ -94,11 +98,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (state.currentBeadCount >= BEADS_PER_ROUND) {
             state.currentBeadCount = 0;
             state.completedRounds++;
+            if (state.completedRounds >= schedule.targetRounds) {
+                todayFinishModal.classList.remove('hidden');
+            }
         }
 
         saveState();
         updateUI();
     }
+
+    closeTodayFinishBtn.addEventListener('click', () => {
+        todayFinishModal.classList.add('hidden');
+    });
 
     function resetProgress(isNextDay = false) {
         if (isNextDay) {
