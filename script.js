@@ -119,6 +119,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------
+    // DAILY REMINDER NOTIFICATION
+    // -------------------
+    function requestNotificationPermission() {
+        if ('Notification' in window && Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        }
+    }
+
+    function showDailyReminderNotification() {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            const schedule = getScheduleForDay(state.currentDayIndex);
+            new Notification('နေ့စဉ် သတိပေးချက်', {
+                body: `ယနေ့အတွက် ပုတီးစိပ်ခြင်း မပြီးသေးပါ။ နေ့ ${schedule.dayNumber} အတွက် ပြုလုပ်ပါ။`,
+                icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png' // Example icon
+            });
+        }
+    }
+
+    // Schedule notification at a specific time (e.g., 8:00 AM)
+    function scheduleDailyReminder() {
+        const now = new Date();
+        const nextReminder = new Date();
+        nextReminder.setHours(8, 0, 0, 0); // 8:00 AM
+        if (now > nextReminder) {
+            nextReminder.setDate(nextReminder.getDate() + 1);
+        }
+        const timeout = nextReminder.getTime() - now.getTime();
+        setTimeout(() => {
+            showDailyReminderNotification();
+            // Reschedule for next day
+            scheduleDailyReminder();
+        }, timeout);
+    }
+
+    // Request permission and schedule on load
+    requestNotificationPermission();
+    scheduleDailyReminder();
+
+    // -------------------
     // EVENT LISTENERS
     // -------------------
     beadButton.addEventListener('click', handleBeadClick);
